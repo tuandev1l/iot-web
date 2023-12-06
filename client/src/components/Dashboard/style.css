@@ -1,0 +1,178 @@
+.dashboard {
+  display: flex;
+  justify-content: center;
+  width: 100vw;
+  /* height: 100vh; */
+  align-items: center;
+  flex-direction: column;
+}
+
+.dashboard__header {
+  width: 100vw;
+  height: 64px;
+  margin-bottom: 52px;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.auth__btn.logout__btn {
+  margin: 0;
+  box-shadow: none;
+}
+
+.dashboard__info__wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.dashboard__info,
+.dashboard__info--detail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard__info--detail {
+  background-color: #fff;
+  padding: 4px;
+  padding-left: 12px;
+  padding-right: 12px;
+  gap: 12px;
+  border-radius: 12px;
+}
+
+.dashboard__info {
+  gap: 24px;
+}
+
+.dashboard__header {
+  justify-content: space-between;
+}
+
+.dashboard__wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60vw;
+  flex-direction: column;
+}
+
+.dashboard__header--avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.dashboard__controller {
+  display: flex;
+  gap: 4vw;
+}
+
+.dashboard__plate__wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 32vw;
+}
+
+.car__plate__img {
+  width: 200px;
+  height: 200px;
+}
+
+.car__plate__detection {
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+}
+
+.dashboard__plate__input {
+  width: 200px;
+}
+
+.car__plate {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.car__plate__btn {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.car__plate__detection {
+  display: flex;
+  gap: 12px;
+}
+
+.dashboard__parking {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 180px;
+}
+
+.dashboard__left,
+.dashboard__right {
+  display: flex;
+  flex-direction: column;
+}
+
+.parking__input {
+  width: 320px;
+  height: 120px;
+  background-color: #a3e635;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  border: 4px solid #000;
+}
+
+.parking__input span {
+  width: 40px;
+  height: 40px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+}
+
+.dashboard__left .parking__input {
+  border-right: none;
+}
+
+.dashboard__left .parking__input:nth-child(2) {
+  border-top: none;
+  border-bottom: none;
+}
+
+.dashboard__right .parking__input {
+  border-left: none;
+}
+
+.dashboard__right .parking__input:nth-child(2) {
+  border-top: none;
+  border-bottom: none;
+}
+
+.parking__status {
+  margin-top: 80px;
+  font-size: 24px;
+}
+
+.parking__status div {
+  font-family: 'BlinkMacSystemFont', sans-serif;
+}
+
+.parking__input.active {
+  background-color: #ef4444;
+}

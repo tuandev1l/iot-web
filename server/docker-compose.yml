@@ -1,0 +1,18 @@
+version: '1'
+services:
+  db:
+    container_name: 'iot-container'
+    image: mysql
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=iot
+      - MYSQL_ROOT_PASSWORD=tuantm
+    ports:
+      - '3306:3306'
+    volumes:
+      - db:/var/lib/mysql
+volumes:
+  db:
+    driver: local
