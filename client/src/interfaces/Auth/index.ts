@@ -9,6 +9,7 @@ export interface IAuthRes {
   car_plate: string;
   description: string;
   role: string;
+  money: number;
 }
 
 export type ILogin = Pick<IAuthRes, 'username'> & Pick<ISignup, 'password'>;

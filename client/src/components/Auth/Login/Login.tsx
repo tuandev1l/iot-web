@@ -25,6 +25,7 @@ export const Login = ({}: Props) => {
     toast({ type: 'success', message: 'Login successfully' });
     localStorage.setItem('username', data.username);
     localStorage.setItem('role', data.role);
+    localStorage.setItem('money', `${data.money}`);
     setTimeout(() => {
       location.reload();
     }, 2000);

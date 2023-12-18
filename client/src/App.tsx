@@ -1,15 +1,18 @@
+import { useContext, useEffect, useState } from 'react';
 import {
   Navigate,
   Route,
   BrowserRouter as Router,
   Routes,
 } from 'react-router-dom';
-import Home from './components/Home';
-import Dashboard from './components/Dashboard';
-import Signup from './components/Auth/Signup';
 import Login from './components/Auth/Login';
+import Signup from './components/Auth/Signup';
+import Dashboard from './components/Dashboard';
+import Home from './components/Home';
+import { Error } from './components/Status/Error';
+import { Success } from './components/Status/Success';
 import { Context, Provider } from './components/store/Provider';
-import { useContext, useEffect, useState } from 'react';
+import Profile from './components/Profile';
 
 function App() {
   const context = useContext(Context);
@@ -36,6 +39,22 @@ function App() {
             path='/dashboard'
             element={isLogin ? <Dashboard /> : <Navigate to={'/login'} />}
           />
+          <Route
+            path='/success'
+            element={isLogin ? <Success /> : <Navigate to={'/login'} />}
+          />
+          <Route
+            path='/error'
+            element={isLogin ? <Error /> : <Navigate to={'/login'} />}
+          />
+          <Route
+            path='/profile'
+            element={isLogin ? <Profile /> : <Navigate to={'/login'} />}
+          />
+          {/* <Route
+            path='*'
+            element={isLogin ? <Error /> : <Navigate to={'/login'} />}
+          /> */}
         </Routes>
       </Router>
     </Provider>

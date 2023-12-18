@@ -37,3 +37,22 @@
 .home__button:hover {
   cursor: pointer;
 }
+
+@media screen and (max-width: 320px) {
+  .home__wrapper {
+    padding: 12px;
+  }
+
+  .home__tile {
+    font-size: 32px;
+  }
+
+  .home__subtitle {
+    font-size: 20px;
+  }
+
+  .home__button {
+    width: 180px;
+    font-size: 14px;
+  }
+}

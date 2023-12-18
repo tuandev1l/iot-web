@@ -1,36 +1,14 @@
+import { Header } from './Header';
 import './style.css';
 
 type Props = {};
 
 export const Dashboard = ({}: Props) => {
-  const logoutHandler = () => {
-    document.cookie = 'accessToken=;expires=Thu, 01 Jan 1970 00:00:01 GMT';
-    setTimeout(() => {
-      location.reload();
-    }, 500);
-  };
-
   const role = localStorage.getItem('role');
 
   return (
     <div className='dashboard'>
-      <div className='dashboard__header'>
-        <div>Smart parking system</div>
-        <div className='dashboard__info__wrapper'>
-          <div className='dashboard__info'>
-            <div>Money: 100000</div>
-            <div className='dashboard__info--detail'>
-              <img className='dashboard__header--avatar' src='user.png' />
-              <div>tuantm</div>
-            </div>
-          </div>
-          <div>
-            <button className='auth__btn logout__btn' onClick={logoutHandler}>
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
+      <Header />
       <div className='dashboard__controller'>
         {role === 'admin' && (
           <div className='dashboard__plate__wrapper'>

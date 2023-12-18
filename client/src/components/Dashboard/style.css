@@ -2,7 +2,6 @@
   display: flex;
   justify-content: center;
   width: 100vw;
-  /* height: 100vh; */
   align-items: center;
   flex-direction: column;
 }
@@ -175,4 +174,35 @@
 
 .parking__input.active {
   background-color: #ef4444;
+}
+
+@media screen and (max-width: 320px) {
+  .dashboard__header {
+    flex-direction: column;
+    height: 96px;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .dashboard__info--detail div {
+    display: none;
+  }
+
+  .dashboard__parking {
+    gap: 12px;
+  }
+
+  .parking__input {
+    width: 120px;
+    height: 80px;
+  }
+
+  .parking__status {
+    margin-top: 32px;
+    font-size: 20px;
+  }
+
+  .dashboard__wrapper {
+    width: 100%;
+  }
 }
