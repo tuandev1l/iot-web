@@ -4,6 +4,7 @@ import { IAuthRes, ISignup } from '../../../interfaces/Auth';
 import { instance } from '../../config/axios';
 import { useCustomToast } from '../../hook/useCustomToast';
 import '../style.css';
+import { socket } from '../../../constant';
 
 type Props = {};
 
@@ -31,9 +32,14 @@ export const Signup = ({}: Props) => {
       'auth/signup',
       signup
     );
+
+    socket.emit('connection', data.id);
+
     toast({ type: 'success', message: 'Signup successfully' });
-    localStorage.setItem('name', data.fullName);
+    localStorage.setItem('id', data.id);
+    localStorage.setItem('username', data.username);
     localStorage.setItem('role', data.role);
+    localStorage.setItem('money', `${data.money}`);
     setTimeout(() => {
       location.reload();
     }, 2000);

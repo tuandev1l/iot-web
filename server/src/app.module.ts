@@ -8,6 +8,7 @@ import { ParkingModule } from './parking/parking.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtMiddleware } from './auth/jwt-middleware.middleware';
+import { SocketGateway } from './socket.gateway';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { JwtMiddleware } from './auth/jwt-middleware.middleware';
     AuthModule,
   ],
   controllers: [],
-  providers: [JwtService],
+  providers: [JwtService, SocketGateway],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -1,9 +1,10 @@
-export interface ISignup extends Omit<IAuthRes, 'role'> {
+export interface ISignup extends Omit<IAuthRes, 'role' | 'money' | 'id'> {
   password: string;
   passwordConfirm: string;
 }
 
 export interface IAuthRes {
+  id: string;
   username: string;
   fullName: string;
   car_plate: string;

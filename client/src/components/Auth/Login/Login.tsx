@@ -4,6 +4,7 @@ import { IAuthRes, ILogin } from '../../../interfaces/Auth';
 import { instance } from '../../config/axios';
 import { useCustomToast } from '../../hook/useCustomToast';
 import '../style.css';
+import { socket } from '../../../constant';
 
 type Props = {};
 
@@ -22,7 +23,11 @@ export const Login = ({}: Props) => {
       'auth/login',
       login
     );
+
+    socket.emit('connection', data.id);
+
     toast({ type: 'success', message: 'Login successfully' });
+    localStorage.setItem('id', data.id);
     localStorage.setItem('username', data.username);
     localStorage.setItem('role', data.role);
     localStorage.setItem('money', `${data.money}`);
