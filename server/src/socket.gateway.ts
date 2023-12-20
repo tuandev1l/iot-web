@@ -21,7 +21,6 @@ export class SocketGateway {
     @ConnectedSocket() client: Socket,
   ) {
     const id = client.id;
-    console.log(id);
     if (!this.socketArr.includes(id)) {
       this.socketArr.push(id);
       this.userIdArr.push(userId);
@@ -33,12 +32,14 @@ export class SocketGateway {
     @MessageBody() parkingInfo: { number: number; userId: string },
   ) {
     const { userId, number } = parkingInfo;
+    console.log(userId, number);
+
     // this.userIdArr.forEach((el) => console.log(el));
     // this.socketArr.forEach((el) => console.log(el));
     const index = this.userIdArr.indexOf(parkingInfo.userId);
-    // console.log(index);
+    console.log(index);
     if (index < 0) return;
-    this.server.volatile.emit('parking', {
+    this.server.emit('parking', {
       number,
       userId,
     });

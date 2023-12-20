@@ -8,7 +8,7 @@ import { socket } from '../../../constant';
 
 type Props = {};
 
-const initValue: ISignup = {
+export const initValue: ISignup = {
   fullName: '',
   car_plate: '',
   password: '',

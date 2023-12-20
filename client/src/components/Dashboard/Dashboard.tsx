@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { socket } from '../../constant';
 import { Header } from './Header';
 import './style.css';
+import { instance } from '../config/axios';
+import { useCustomToast } from '../hook/useCustomToast';
+import { initValue } from '../Auth/Signup/Signup';
+import { IAuthRes } from '../../interfaces/Auth';
 
 type Props = {};
 
@@ -31,33 +35,74 @@ interface ICurrentlyParking {
 }
 
 export const Dashboard = ({}: Props) => {
+  const gateURL = 'http://192.168.69.82/open/';
+  const carURL = 'http://192.168.69.22/parking/';
   const role = localStorage.getItem('role');
+  const [imgUrl, setImgUrl] = useState<string>('');
+  const [carPlate, setCarPlate] = useState<string>('');
   const [parkings, setParkings] = useState<IStateParking[]>(initialState);
   const [parkingStatus, setParkingStatus] = useState<ICurrentlyParking>({
     isCurrentlyParking: false,
     parkingNumber: 0,
   });
+  const [parking, setParking] = useState<number>(1);
+  const [user, setUser] = useState<IAuthRes | null>(null);
+  const toast = useCustomToast();
 
   useEffect(() => {
-    console.log(parkingStatus);
-  }, [parkingStatus]);
+    console.log(parking);
+  }, [parking]);
+
+  const captureHandler = async () => {
+    const { data } = await instance.get('parking/spoof/in');
+    setImgUrl(data.img);
+    setCarPlate(data.res);
+  };
 
   useEffect(() => {
     socket.emit('connection', localStorage.getItem('id'));
   }, []);
 
-  const parkingHandler = (number: number) => {
-    socket.emit('parking', { number, userId: localStorage.getItem('id') });
+  const checkHandler = async (number: number) => {
+    try {
+      const { data } = await instance.post('parking/checking', {
+        plate: carPlate,
+      });
+      setUser(data);
+      toast({ type: 'success', message: 'Open the gate' });
+      instance.get(`${gateURL}${number}`);
+    } catch (error) {}
+  };
+
+  const parkingCarHandler = async () => {
+    console.log(user);
+    try {
+      await instance.get(`${carURL}${parking}`);
+      setParking((prev) => {
+        if (prev + 1 > 3) return prev;
+        return prev + 1;
+      });
+      toast({ type: 'success', message: 'Parking successful' });
+      console.log(parking);
+      socket.emit('parking', {
+        number: parking,
+        userId: user?.id,
+      });
+    } catch (error) {}
   };
 
   useEffect(() => {
     socket.on(
       'parking',
       ({ number, userId }: { number: number; userId: string }) => {
-        const parkingActive = parkings.find((p) => p.number === number);
-        if (!parkingActive) return;
-        parkingActive.isParked = !parkingActive.isParked;
-        setParkings([...parkings]);
+        console.log('im here');
+        try {
+          const parkingActive = parkings.find((p) => p.number === number)!;
+          parkingActive.isParked = !parkingActive.isParked;
+          setParkings([...parkings]);
+        } catch (error) {
+          return;
+        }
 
         const isCurrentUser = localStorage.getItem('id') === userId;
         if (isCurrentUser) {
@@ -83,16 +128,34 @@ export const Dashboard = ({}: Props) => {
               <div>Biển số xe:</div>
               <img
                 className='car__plate__img'
-                src='https://cdn.vectorstock.com/i/preview-1x/65/30/default-image-icon-missing-picture-page-vector-40546530.jpg'
+                src={`${
+                  imgUrl
+                    ? imgUrl
+                    : 'https://cdn.vectorstock.com/i/preview-1x/65/30/default-image-icon-missing-picture-page-vector-40546530.jpg'
+                }`}
               />
             </div>
             <div className='car__plate__detection'>
               <div>Nhận diện: </div>
-              <input className='dashboard__plate__input' />
+              <input
+                className='dashboard__plate__input'
+                onChange={(e) => setCarPlate(e.target.value)}
+                value={carPlate}
+              />
             </div>
             <div className='car__plate__btn'>
-              <button className='auth__btn'>Capture</button>
-              <button className='auth__btn'>Check</button>
+              <button className='auth__btn' onClick={captureHandler}>
+                Capture
+              </button>
+              <button className='auth__btn' onClick={() => checkHandler(1)}>
+                In
+              </button>
+              <button className='auth__btn' onClick={() => checkHandler(0)}>
+                Out
+              </button>
+              <button className='auth__btn' onClick={parkingCarHandler}>
+                Parking
+              </button>
             </div>
           </div>
         )}
@@ -103,7 +166,7 @@ export const Dashboard = ({}: Props) => {
                 <div
                   key={number}
                   className={`parking__input ${isParked && 'active'}`}
-                  onClick={() => parkingHandler(number)}
+                  // onClick={() => parkingHandler(number)}
                 >
                   <span>{number}</span>
                 </div>

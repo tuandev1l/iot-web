@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Parking } from './entities/parking.entity';
 import { Repository } from 'typeorm';
@@ -19,6 +19,12 @@ export class ParkingService {
     @InjectRepository(Parking) private repository: Repository<Parking>,
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
+
+  async checkingPlate(body: { plate: string }) {
+    const user = await this.userRepository.findOneBy({ car_plate: body.plate });
+    if (!user) throw new NotFoundException();
+    return user;
+  }
 
   async getAllParking(): Promise<Parking[]> {
     return this.repository.find();
