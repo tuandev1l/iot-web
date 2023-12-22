@@ -53,11 +53,18 @@
   justify-content: space-between;
 }
 
+.dashboard__upload__img {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
 .dashboard__wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 60vw;
+  width: 50vw;
   flex-direction: column;
 }
 
@@ -75,12 +82,12 @@
 .dashboard__plate__wrapper {
   display: flex;
   flex-direction: column;
-  width: 32vw;
+  width: 40vw;
 }
 
 .car__plate__img {
-  width: 200px;
-  height: 200px;
+  width: 240px;
+  height: 240px;
 }
 
 .car__plate__detection {
@@ -174,6 +181,15 @@
 
 .parking__input.active {
   background-color: #ef4444;
+}
+
+.auth__btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth__btn.disabled:active {
+  transform: scale(1);
 }
 
 @media screen and (max-width: 320px) {

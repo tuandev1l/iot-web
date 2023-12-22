@@ -17,13 +17,13 @@ import { ParkingService } from './parking.service';
 
 @Controller('parking')
 export class ParkingController {
-  constructor(private readonly service: ParkingService) {}
-
   private cnt = 0;
   private imgs = ['MV9tMzZxaHA', 'Ml9yb2F5YjU', 'M195dHc5MnM', 'NF9oNG55ZXI'];
   private res = ['60A55655', '68A08749', '56N5162', '51H59540'];
 
-  @Get('spoof/in')
+  constructor(private readonly service: ParkingService) {}
+
+  @Get('/spoof/in')
   async carInSpoof() {
     this.cnt++;
 
@@ -49,7 +49,12 @@ export class ParkingController {
     return this.service.checkingPlate(body);
   }
 
-  @Get('spoof/out')
+  @Get('/slots')
+  async getAllParkingSlots() {
+    return this.service.getAllParkingSlots();
+  }
+
+  @Get('/spoof/out')
   async carOutSpoof() {
     this.cnt--;
 

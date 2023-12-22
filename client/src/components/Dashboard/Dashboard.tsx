@@ -1,11 +1,11 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { socket } from '../../constant';
-import { Header } from './Header';
-import './style.css';
+import { IAuthRes } from '../../interfaces/Auth';
 import { instance } from '../config/axios';
 import { useCustomToast } from '../hook/useCustomToast';
-import { initValue } from '../Auth/Signup/Signup';
-import { IAuthRes } from '../../interfaces/Auth';
+import { Header } from './Header';
+import './style.css';
 
 type Props = {};
 
@@ -34,31 +34,62 @@ interface ICurrentlyParking {
   parkingNumber: number;
 }
 
+const cloudName = 'dfa7qyx7z';
+const gateURL = 'http://192.168.69.82/open/';
+const carURL = 'http://192.168.69.22/parking/';
+const plateRecognizationURL = 'http://localhost:8080/get-car-plate';
+
 export const Dashboard = ({}: Props) => {
-  const gateURL = 'http://192.168.69.82/open/';
-  const carURL = 'http://192.168.69.22/parking/';
   const role = localStorage.getItem('role');
   const [imgUrl, setImgUrl] = useState<string>('');
+  const [imgResUrl, setImgResUrl] = useState<string>('');
   const [carPlate, setCarPlate] = useState<string>('');
   const [parkings, setParkings] = useState<IStateParking[]>(initialState);
   const [parkingStatus, setParkingStatus] = useState<ICurrentlyParking>({
     isCurrentlyParking: false,
     parkingNumber: 0,
   });
-  const [parking, setParking] = useState<number>(1);
   const [user, setUser] = useState<IAuthRes | null>(null);
   const toast = useCustomToast();
 
-  useEffect(() => {
-    console.log(parking);
-  }, [parking]);
+  const uploadImgHandler = async (files: FileList | null) => {
+    try {
+      if (!files) return;
 
-  const captureHandler = async () => {
-    const { data } = await instance.get('parking/spoof/in');
-    setImgUrl(data.img);
-    setCarPlate(data.res);
+      const img = files[0];
+
+      const formData = new FormData();
+      formData.append('file', img);
+      formData.append('upload_preset', 'ml_default');
+
+      const { data } = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
+        formData
+      );
+      setImgUrl(data.secure_url);
+    } catch (error) {
+      toast({ type: 'error', message: 'Can not upload image file' });
+    }
   };
 
+  useEffect(() => {
+    (async () => {
+      const { data } = await instance.get('parking/slots');
+      setParkings(data);
+    })();
+  }, []);
+
+  const captureHandler = async () => {
+    const { data } = await instance.post(plateRecognizationURL, {
+      imgUrl,
+    });
+    setUser(null);
+    setImgResUrl(data.img);
+    setCarPlate(data.res);
+    setImgUrl('');
+  };
+
+  // remove when you are in prod
   useEffect(() => {
     socket.emit('connection', localStorage.getItem('id'));
   }, []);
@@ -70,23 +101,16 @@ export const Dashboard = ({}: Props) => {
       });
       setUser(data);
       toast({ type: 'success', message: 'Open the gate' });
-      instance.get(`${gateURL}${number}`);
+      // instance.get(`${gateURL}${number}`);
     } catch (error) {}
   };
 
   const parkingCarHandler = async () => {
-    console.log(user);
     try {
-      await instance.get(`${carURL}${parking}`);
-      setParking((prev) => {
-        if (prev + 1 > 3) return prev;
-        return prev + 1;
-      });
+      // await instance.get(`${carURL}${parking}`);
       toast({ type: 'success', message: 'Parking successful' });
-      console.log(parking);
       socket.emit('parking', {
-        number: parking,
-        userId: user?.id,
+        userId: user?.id || localStorage.getItem('id'),
       });
     } catch (error) {}
   };
@@ -95,7 +119,6 @@ export const Dashboard = ({}: Props) => {
     socket.on(
       'parking',
       ({ number, userId }: { number: number; userId: string }) => {
-        console.log('im here');
         try {
           const parkingActive = parkings.find((p) => p.number === number)!;
           parkingActive.isParked = !parkingActive.isParked;
@@ -134,6 +157,21 @@ export const Dashboard = ({}: Props) => {
                     : 'https://cdn.vectorstock.com/i/preview-1x/65/30/default-image-icon-missing-picture-page-vector-40546530.jpg'
                 }`}
               />
+              <img
+                className='car__plate__img'
+                src={`${
+                  imgResUrl
+                    ? imgResUrl
+                    : 'https://cdn.vectorstock.com/i/preview-1x/65/30/default-image-icon-missing-picture-page-vector-40546530.jpg'
+                }`}
+              />
+            </div>
+            <div className='dashboard__upload__img'>
+              <div>Upload img:</div>
+              <input
+                type='file'
+                onChange={(e) => uploadImgHandler(e.target.files)}
+              />
             </div>
             <div className='car__plate__detection'>
               <div>Nhận diện: </div>
@@ -153,7 +191,11 @@ export const Dashboard = ({}: Props) => {
               <button className='auth__btn' onClick={() => checkHandler(0)}>
                 Out
               </button>
-              <button className='auth__btn' onClick={parkingCarHandler}>
+              <button
+                className={`auth__btn ${!user && 'disabled'}`}
+                disabled={!user && true}
+                onClick={parkingCarHandler}
+              >
                 Parking
               </button>
             </div>
@@ -166,32 +208,11 @@ export const Dashboard = ({}: Props) => {
                 <div
                   key={number}
                   className={`parking__input ${isParked && 'active'}`}
-                  // onClick={() => parkingHandler(number)}
                 >
                   <span>{number}</span>
                 </div>
               ))}
             </div>
-            {/* <div className='parking__input' onClick={() => parkingHandler(3)}>
-              <span>3</span>
-            </div>
-            <div className='parking__input' onClick={() => parkingHandler(3)}>
-              <span>2</span>
-            </div>
-            <div className='parking__input' onClick={() => parkingHandler(3)}>
-              <span>1</span>
-            </div> */}
-            {/* <div className='dashboard__right'>
-              <div className='parking__input'>
-                <span>4</span>
-              </div>
-              <div className='parking__input'>
-                <span>5</span>
-              </div>
-              <div className='parking__input'>
-                <span>6</span>
-              </div>
-            </div> */}
           </div>
           {role === 'user' && (
             <div className='parking__status'>

@@ -8,7 +8,8 @@ import { ParkingModule } from './parking/parking.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtMiddleware } from './auth/jwt-middleware.middleware';
-import { SocketGateway } from './socket.gateway';
+import { SocketModule } from './socket/socket.module';
+import { SocketGateway } from './socket/socket.gateway';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SocketGateway } from './socket.gateway';
     ParkingModule,
     UsersModule,
     AuthModule,
+    SocketModule,
   ],
   controllers: [],
   providers: [JwtService, SocketGateway],

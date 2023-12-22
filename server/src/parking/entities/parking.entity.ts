@@ -13,5 +13,5 @@ export class Parking {
   user: User;
 
   @Column()
-  status: string;
+  isParked: boolean;
 }
