@@ -1,0 +1,33 @@
+.adding__money {
+  padding: 64px;
+}
+
+.select__money__wrapper {
+}
+
+.money__btn__wrapper {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth__btn.money__btn {
+  width: 240px;
+}
+
+.price__element {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+}
+
+.price__wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  margin-top: 16px;
+}

@@ -15,11 +15,10 @@ export const Success = ({}: Props) => {
 
   useEffect(() => {
     (async () => {
-      const { data } = await instance.post('parking/addingMoney', {
+      await instance.post('parking/addingMoney', {
         id: param.get('id'),
         amount: +param.get('amount')!,
       });
-      localStorage.setItem('money', data.money);
     })();
   }, []);
 

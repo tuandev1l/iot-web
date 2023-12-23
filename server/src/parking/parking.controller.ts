@@ -18,60 +18,23 @@ import { ParkingService } from './parking.service';
 @Controller('parking')
 export class ParkingController {
   private cnt = 0;
-  private imgs = ['MV9tMzZxaHA', 'Ml9yb2F5YjU', 'M195dHc5MnM', 'NF9oNG55ZXI'];
-  private res = ['60A55655', '68A08749', '56N5162', '51H59540'];
 
   constructor(private readonly service: ParkingService) {}
 
-  @Get('/spoof/in')
-  async carInSpoof() {
-    this.cnt++;
-
-    if (this.cnt > 3) this.cnt = 3;
-
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(null);
-      }, 5000);
-    });
-
-    return {
-      img: `https://res-console.cloudinary.com/dfa7qyx7z/thumbnails/v1/image/upload/v1702904927/${
-        this.imgs[this.cnt - 1]
-      }=/grid_landscape`,
-      res: this.res[this.cnt - 1],
-    };
-  }
-
   @HttpCode(200)
   @Post('/checking')
-  async checkingPlate(@Body() body: { plate: string }) {
+  async checkingPlate(@Body() body: { plate: string; isIn: boolean }) {
     return this.service.checkingPlate(body);
+  }
+
+  @Get('/paying-money')
+  async payingMoney(@GetUser() user: User) {
+    return this.service.payingMoney(user);
   }
 
   @Get('/slots')
   async getAllParkingSlots() {
     return this.service.getAllParkingSlots();
-  }
-
-  @Get('/spoof/out')
-  async carOutSpoof() {
-    this.cnt--;
-
-    if (this.cnt < 0) this.cnt = 0;
-
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(null);
-      }, 5000);
-    });
-
-    return {
-      img: `https://res-console.cloudinary.com/dfa7qyx7z/thumbnails/v1/image/upload/v1702904927/${
-        this.imgs[this.cnt + 1]
-      }=/grid_landscape`,
-      res: this.res[this.cnt + 1],
-    };
   }
 
   @Post('/addingMoney')

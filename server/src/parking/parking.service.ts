@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Parking } from './entities/parking.entity';
 import { Repository } from 'typeorm';
@@ -8,6 +15,7 @@ import { AddingMoney } from './dtos/addingMoney.dto';
 import * as Stripe from 'stripe';
 import * as process from 'process';
 import { User } from '../users/entities/user.entity';
+import * as moment from 'moment';
 
 @Injectable()
 export class ParkingService implements OnModuleInit {
@@ -34,10 +42,44 @@ export class ParkingService implements OnModuleInit {
     return false;
   }
 
-  async checkingPlate(body: { plate: string }) {
+  async payingMoney(user: User) {
+    const parkingSlot = await this.getParkingSlotOfUser(user);
+
+    const dayIn = moment(parkingSlot.date);
+    const dayOut = moment();
+    const diff = dayOut.diff(dayIn, 'day');
+
+    const money = (diff + 1) * 30000;
+    if (user.money < money) {
+      throw new BadRequestException('You do not have enough money');
+    }
+    user.money -= money;
+    await this.userRepository.save(user);
+
+    await this.updateParking(parkingSlot.id, {
+      isParked: false,
+      user: null,
+    });
+  }
+
+  async checkingPlate(body: { plate: string; isIn: boolean }) {
     const user = await this.userRepository.findOneBy({ car_plate: body.plate });
     if (!user) throw new NotFoundException();
-    return user;
+    let number = 0;
+    if (body.isIn) {
+      const parkingSlot = await this.getParkingSlot();
+      if (!parkingSlot) throw new BadRequestException('No more parking slot');
+      number = parkingSlot.number;
+    }
+    // if (body.isIn) {
+    //   const isParked = !!(await this.repository.findOneBy({ user }));
+    //   if (isParked) throw new ForbiddenException('This car has parked yet');
+    // } else {
+    //   const isParked = !!(await this.repository.findOneBy({ user }));
+    //   if (!isParked)
+    //     throw new ForbiddenException('This car has not parked yet');
+    // }
+    return { user, number };
   }
 
   async getAllParking(): Promise<Parking[]> {
@@ -58,6 +100,10 @@ export class ParkingService implements OnModuleInit {
   async updateParking(id: string, updateParkingDto: UpdateParkingDto) {
     const parking = await this.getParking(id);
     parking.isParked = updateParkingDto.isParked;
+    parking.user = updateParkingDto.user;
+    if (updateParkingDto.date) {
+      parking.date = updateParkingDto.date;
+    }
     return this.repository.save(parking);
   }
 
@@ -103,7 +149,10 @@ export class ParkingService implements OnModuleInit {
   }
 
   async getAllParkingSlots() {
-    const parkingSlots = await this.repository.find();
-    return parkingSlots.reverse();
+    return this.repository.find({ relations: ['user'] });
+  }
+
+  async getParkingSlotOfUser(user: User) {
+    return this.repository.findOneBy({ user });
   }
 }

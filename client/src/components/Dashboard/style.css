@@ -85,9 +85,14 @@
   width: 40vw;
 }
 
+.dashboard__price {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
 .car__plate__img {
-  width: 240px;
-  height: 240px;
+  width: 400px;
+  height: 200px;
 }
 
 .car__plate__detection {

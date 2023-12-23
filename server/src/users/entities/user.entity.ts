@@ -1,5 +1,11 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Parking } from '../../parking/entities/parking.entity';
 
 @Entity('users')
@@ -20,7 +26,7 @@ export class User {
   @Column({ nullable: false })
   car_plate: string;
 
-  @Column({ default: 1000000 })
+  @Column({ default: 0 })
   money: number;
 
   @Column({ nullable: true })
@@ -29,6 +35,7 @@ export class User {
   @Column({ default: 'user' })
   role: string;
 
-  @OneToOne(() => Parking)
+  @OneToOne((_) => Parking, (parking) => parking.id)
+  @JoinColumn()
   parking: Parking;
 }

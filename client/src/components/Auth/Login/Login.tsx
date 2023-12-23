@@ -30,7 +30,6 @@ export const Login = ({}: Props) => {
     localStorage.setItem('id', data.id);
     localStorage.setItem('username', data.username);
     localStorage.setItem('role', data.role);
-    localStorage.setItem('money', `${data.money}`);
     setTimeout(() => {
       location.reload();
     }, 2000);

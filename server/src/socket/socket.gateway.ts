@@ -6,8 +6,15 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Controller } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ParkingService } from '../parking/parking.service';
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/entities/user.entity';
+import * as moment from 'moment';
 
 @Controller()
 @WebSocketGateway()
@@ -18,33 +25,46 @@ export class SocketGateway {
   private socketArr: string[] = [];
 
   constructor(
-    // @InjectRepository(Parking) private parkingRepository: Repository<Parking>,
     private parkingService: ParkingService,
+    private userService: UsersService,
   ) {}
 
   @SubscribeMessage('connection')
   private handleCustomConnection(
-    @MessageBody() userId: string,
+    @MessageBody() body: { userId: string },
     @ConnectedSocket() client: Socket,
   ) {
     const id = client.id;
     console.log(id);
     if (!this.socketArr.includes(id)) {
       this.socketArr.push(id);
-      this.userIdArr.push(userId);
+      this.userIdArr.push(body.userId);
     }
+  }
+
+  @SubscribeMessage('unparking')
+  private async handleUnparking(
+    @MessageBody() unparkingInfo: { number: number; userId: string },
+  ) {
+    const { userId, number } = unparkingInfo;
+    const user = await this.userService.findOne(userId);
+
+    this.server.emit('unparking', {
+      number,
+      userId,
+    });
   }
 
   @SubscribeMessage('parking')
   private async handleParking(@MessageBody() parkingInfo: { userId: string }) {
     const { userId } = parkingInfo;
-    console.log(userId);
 
-    // const index = this.userIdArr.indexOf(parkingInfo.userId);
     const parkingSlot = await this.parkingService.getParkingSlot();
+    const user = await this.userService.findOne(userId);
     await this.parkingService.updateParking(parkingSlot.id, {
-      ...parkingSlot,
-      isParked: !parkingSlot.isParked,
+      isParked: true,
+      user,
+      date: new Date(),
     });
     this.server.emit('parking', {
       number: parkingSlot.number,
